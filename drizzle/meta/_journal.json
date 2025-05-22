@@ -15,6 +15,13 @@
             "when": 1747848649285,
             "tag": "0001_unique_quentin_quire",
             "breakpoints": true
+        },
+        {
+            "idx": 2,
+            "version": "7",
+            "when": 1747891886752,
+            "tag": "0002_mushy_red_shift",
+            "breakpoints": true
         }
     ]
 }
