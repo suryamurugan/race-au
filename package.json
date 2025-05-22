@@ -1,5 +1,5 @@
 {
-    "name": "rstart",
+    "name": "race",
     "version": "0.1.0",
     "private": true,
     "scripts": {
@@ -14,6 +14,8 @@
         "db:auth:generate": "pnpm dlx @better-auth/cli generate --output src/server/db/auth-schema.ts -y"
     },
     "dependencies": {
+        "@radix-ui/react-label": "^2.1.7",
+        "@radix-ui/react-slot": "^1.2.3",
         "@tanstack/react-query": "^5.74.3",
         "@trpc/client": "^11.1.0",
         "@trpc/react-query": "^11.1.0",
@@ -29,6 +31,7 @@
         "pg": "^8.14.1",
         "react": "^19.0.0",
         "react-dom": "^19.0.0",
+        "resend": "^4.5.1",
         "server-only": "^0.0.1",
         "superjson": "^2.2.2",
         "tailwind-merge": "^3.2.0",

@@ -1,8 +1,8 @@
-# rstart - Project Rules & Documentation
+# race - Project Rules & Documentation
 
 ## Project Overview
 
-rstart is a modern full-stack boilerplate designed to streamline web application development with a focus on type safety, developer experience, and scalability. It integrates the latest technologies in the React ecosystem with an opinionated structure that follows best practices.
+race is a modern full-stack boilerplate designed to streamline web application development with a focus on type safety, developer experience, and scalability. It integrates the latest technologies in the React ecosystem with an opinionated structure that follows best practices.
 
 ## Project Rules
 
@@ -105,7 +105,7 @@ The project combines the following technologies:
 ## Project Structure
 
 ```
-rstart/
+race/
 ├── src/
 │   ├── app/                 # Next.js App Router pages and API routes
 │   │   ├── api/
@@ -470,6 +470,6 @@ src/server/jobs/
 
 ## Conclusion
 
-This documentation provides a comprehensive overview of the rstart project structure, features, and best practices. The project combines modern technologies with an opinionated setup to provide a robust foundation for full-stack web application development.
+This documentation provides a comprehensive overview of the race project structure, features, and best practices. The project combines modern technologies with an opinionated setup to provide a robust foundation for full-stack web application development.
 
 For questions or improvements to this documentation, please contribute to the project repository.

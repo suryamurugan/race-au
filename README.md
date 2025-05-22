@@ -1,4 +1,4 @@
-# rstart
+# race
 
 A modern full-stack boilerplate project built with cutting-edge technologies:
 
@@ -171,7 +171,7 @@ Strongly opinionated configurations for consistent code style:
 ## Project Structure
 
 ```plaintext
-rstart/
+race/
 ├── src/
 │   ├── app/
 │   │   ├── layout.tsx       // Main layout and metadata

@@ -36,16 +36,16 @@ export const auth = betterAuth({
     },
     emailAndPassword: {
         enabled: true,
-        disableSignUp: true,
-        requireEmailVerification: true,
-        minPasswordLength: 8,
-        maxPasswordLength: 128,
-        autoSignIn: true,
-        sendResetPassword: async ({ user, url }) => {
-            const { subject, html } = createResetPasswordEmail(url);
-            await sendEmail({ to: user.email, subject, html });
-        },
-        resetPasswordTokenExpiresIn: 3600,
+        // disableSignUp: false,
+        // requireEmailVerification: false,
+        // minPasswordLength: 8,
+        // maxPasswordLength: 128,
+        // autoSignIn: true,
+        // sendResetPassword: async ({ user, url }) => {
+        //     const { subject, html } = createResetPasswordEmail(url);
+        //     await sendEmail({ to: user.email, subject, html });
+        // },
+        // resetPasswordTokenExpiresIn: 3600,
     },
     session: {
         cookieCache: {

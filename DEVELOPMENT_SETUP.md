@@ -1,6 +1,6 @@
-# rstart - Development Environment Setup
+# race - Development Environment Setup
 
-This guide will walk you through the process of setting up your local development environment for the rstart project. Following these steps will ensure you have all necessary tools and configurations to run, develop, and contribute effectively.
+This guide will walk you through the process of setting up your local development environment for the race project. Following these steps will ensure you have all necessary tools and configurations to run, develop, and contribute effectively.
 
 ## 1. Prerequisites
 
@@ -21,7 +21,7 @@ Before you begin, ensure you have the following installed on your system:
 
     ```bash
     git clone <repository-url> # Replace <repository-url> with the actual Git URL
-    cd rstart
+    cd race
     ```
 
 2.  **Install Dependencies**:
@@ -51,7 +51,7 @@ The project requires environment variables for database connections and applicat
     NEXT_PUBLIC_APP_URL="http://localhost:3000"
 
     # Example for a local PostgreSQL setup:
-    # DATABASE_URL="postgresql://postgres:mysecretpassword@localhost:5432/rstart_dev"
+    # DATABASE_URL="postgresql://postgres:mysecretpassword@localhost:5432/race_dev"
     ```
 
     - Replace `USER`, `PASSWORD`, `HOST`, `PORT`, and `DATABASE_NAME` with your actual PostgreSQL credentials and database details.
