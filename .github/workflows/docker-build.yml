@@ -58,8 +58,3 @@ jobs:
                   platforms: linux/amd64
                   build-args: |
                       NEXT_PUBLIC_APP_URL=${{ vars.NEXT_PUBLIC_APP_URL }}
-                      DATABASE_URL=${{ secrets.DATABASE_URL }}
-                      GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
-                      GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
-                      RESEND_API_KEY=${{ secrets.RESEND_API_KEY }}
-                      BETTER_AUTH_SECRET=${{ secrets.BETTER_AUTH_SECRET }}
