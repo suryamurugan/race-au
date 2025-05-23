@@ -34,8 +34,6 @@ ARG GOOGLE_CLIENT_ID="build-time-placeholder"
 ARG GOOGLE_CLIENT_SECRET="build-time-placeholder"
 ARG RESEND_API_KEY="build-time-placeholder"
 ARG BETTER_AUTH_SECRET="build-time-placeholder"
-ARG GITHUB_CLIENT_ID=""
-ARG GITHUB_CLIENT_SECRET=""
 
 # Set build-time environment variables from build arguments
 ENV NODE_ENV=production
@@ -45,8 +43,6 @@ ENV GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID
 ENV GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET
 ENV RESEND_API_KEY=$RESEND_API_KEY
 ENV BETTER_AUTH_SECRET=$BETTER_AUTH_SECRET
-ENV GITHUB_CLIENT_ID=$GITHUB_CLIENT_ID
-ENV GITHUB_CLIENT_SECRET=$GITHUB_CLIENT_SECRET
 
 # Generate Drizzle types
 RUN pnpm run db:generate || echo "Skipping db:generate - may need database connection"
