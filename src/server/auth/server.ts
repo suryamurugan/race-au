@@ -14,6 +14,7 @@ if (!process.env.DATABASE_URL) {
 }
 
 export const auth = betterAuth({
+    secret: process.env.BETTER_AUTH_SECRET!,
     database: drizzleAdapter(db, {
         provider: 'pg',
         usePlural: true,
