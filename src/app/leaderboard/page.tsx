@@ -16,6 +16,7 @@ interface LeaderboardEntry {
     teamName: string;
     totalPoints: number;
     completedTasks: number;
+    memberNames: string[];
 }
 
 interface Challenge {
@@ -41,6 +42,7 @@ export default function LeaderboardPage() {
         );
 
     // Use the confetti effects hook
+    console.log(leaderboardData);
     useLeaderboardEffects(leaderboardData);
 
     const isLoading = challengesLoading || leaderboardLoading;
@@ -115,48 +117,87 @@ export default function LeaderboardPage() {
                                                     index % 2 === 0
                                                         ? 'bg-background'
                                                         : 'bg-primary/5',
-                                                    // Special styling for top 3
+                                                    // Special styling for top 3 only if they have points
                                                     index === 0 &&
+                                                        team.totalPoints > 0 &&
                                                         'border-l-4 border-yellow-500 bg-gradient-to-r from-yellow-500/10 to-transparent',
                                                     index === 1 &&
+                                                        team.totalPoints > 0 &&
                                                         'border-l-4 border-gray-400 bg-gradient-to-r from-gray-400/10 to-transparent',
                                                     index === 2 &&
+                                                        team.totalPoints > 0 &&
                                                         'border-l-4 border-orange-600 bg-gradient-to-r from-orange-600/10 to-transparent',
                                                 )}
                                             >
                                                 <td className="text-foreground px-6 py-4 font-mono text-sm whitespace-nowrap">
                                                     <div className="flex items-center gap-2">
-                                                        <span
-                                                            className={cn(
-                                                                'flex h-8 w-8 items-center justify-center rounded-full font-bold',
-                                                                index === 0 &&
-                                                                    'bg-yellow-500 text-yellow-900',
-                                                                index === 1 &&
-                                                                    'bg-gray-400 text-gray-900',
-                                                                index === 2 &&
-                                                                    'bg-orange-600 text-orange-100',
-                                                                index > 2 &&
-                                                                    'bg-primary/20 text-primary',
-                                                            )}
-                                                        >
-                                                            {index + 1}
-                                                        </span>
-                                                        {index === 0 && (
-                                                            <Trophy className="h-4 w-4 text-yellow-500" />
+                                                        {team.totalPoints >
+                                                        0 ? (
+                                                            <>
+                                                                <span
+                                                                    className={cn(
+                                                                        'flex h-8 w-8 items-center justify-center rounded-full font-bold',
+                                                                        index ===
+                                                                            0 &&
+                                                                            'bg-yellow-500 text-yellow-900',
+                                                                        index ===
+                                                                            1 &&
+                                                                            'bg-gray-400 text-gray-900',
+                                                                        index ===
+                                                                            2 &&
+                                                                            'bg-orange-600 text-orange-100',
+                                                                        index >
+                                                                            2 &&
+                                                                            'bg-primary/20 text-primary',
+                                                                    )}
+                                                                >
+                                                                    {index + 1}
+                                                                </span>
+                                                                {index ===
+                                                                    0 && (
+                                                                    <Trophy className="h-4 w-4 text-yellow-500" />
+                                                                )}
+                                                            </>
+                                                        ) : (
+                                                            <span className="text-muted-foreground text-sm">
+                                                                —
+                                                            </span>
                                                         )}
                                                     </div>
                                                 </td>
                                                 <td className="text-foreground px-6 py-4 font-mono text-sm whitespace-nowrap">
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="font-semibold">
-                                                            {'>'}{' '}
-                                                            {team.teamName}
-                                                        </span>
-                                                        {index <= 2 && (
-                                                            <span className="bg-primary/20 text-primary animate-pulse rounded-full px-2 py-1 text-xs">
-                                                                TOP {index + 1}
+                                                    <div className="flex flex-col gap-1">
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="font-semibold">
+                                                                {'>'}{' '}
+                                                                {team.teamName}
                                                             </span>
-                                                        )}
+                                                            {index <= 2 &&
+                                                                team.totalPoints >
+                                                                    0 && (
+                                                                    <span className="bg-primary/20 text-primary animate-pulse rounded-full px-2 py-1 text-xs">
+                                                                        TOP{' '}
+                                                                        {index +
+                                                                            1}
+                                                                    </span>
+                                                                )}
+                                                        </div>
+                                                        {team.memberNames &&
+                                                            team.memberNames
+                                                                .length > 0 && (
+                                                                <div className="text-muted-foreground text-xs">
+                                                                    {team.memberNames
+                                                                        .filter(
+                                                                            (
+                                                                                name,
+                                                                            ) =>
+                                                                                name,
+                                                                        )
+                                                                        .join(
+                                                                            ', ',
+                                                                        )}
+                                                                </div>
+                                                            )}
                                                     </div>
                                                 </td>
                                                 <td className="text-foreground px-6 py-4 font-mono text-sm whitespace-nowrap">
