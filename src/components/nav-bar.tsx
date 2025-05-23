@@ -1,11 +1,13 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Home, Trophy, Award, User, DatabaseZap } from 'lucide-react';
+import { Home, Trophy, Award, User, DatabaseZap, LogOut } from 'lucide-react';
 import { ThemeToggle } from './theme-toggle';
+import { useSession, signOut } from '@/server/auth/client';
+import { Button } from './ui/button';
 
 const navItems = [
     { label: 'Home', href: '/', icon: Home },
@@ -24,6 +26,13 @@ const navItems = [
 
 export function NavBar() {
     const pathname = usePathname();
+    const router = useRouter();
+    const session = useSession();
+
+    // If not logged in, don't show the navbar
+    if (!session.data) {
+        return null;
+    }
 
     const isActive = (href: string) => {
         if (href.includes('?')) {
@@ -33,10 +42,19 @@ export function NavBar() {
         return pathname === href;
     };
 
+    const handleLogout = async () => {
+        try {
+            await signOut();
+            router.push('/login');
+        } catch (error) {
+            console.error('Failed to logout:', error);
+        }
+    };
+
     return (
         <>
             {/* Desktop Navigation */}
-            <nav className="bg-background/95 border-primary/20 sticky top-0 z-50 border-b backdrop-blur-sm">
+            <nav className="border-primary/20 bg-background/95 sticky top-0 z-50 border-b backdrop-blur-sm">
                 <div className="container mx-auto px-4">
                     <div className="flex h-16 items-center justify-between">
                         <div className="flex items-center gap-8">
@@ -64,7 +82,7 @@ export function NavBar() {
                                         {isActive(item.href) && (
                                             <motion.div
                                                 layoutId="desktop-nav-indicator"
-                                                className="bg-primary/10 border-primary/20 absolute inset-0 z-[-1] rounded-md border"
+                                                className="border-primary/20 bg-primary/10 absolute inset-0 z-[-1] rounded-md border"
                                                 transition={{
                                                     type: 'spring',
                                                     stiffness: 350,
@@ -80,13 +98,22 @@ export function NavBar() {
 
                         <div className="flex items-center space-x-2">
                             <ThemeToggle />
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="text-muted-foreground hover:text-primary font-mono"
+                                onClick={handleLogout}
+                            >
+                                <LogOut className="h-5 w-5" />
+                                <span className="sr-only">Logout</span>
+                            </Button>
                         </div>
                     </div>
                 </div>
             </nav>
 
             {/* Mobile Navigation */}
-            <nav className="bg-background/95 border-primary/20 fixed right-0 bottom-0 left-0 z-50 border-t backdrop-blur-sm md:hidden">
+            <nav className="border-primary/20 bg-background/95 fixed right-0 bottom-0 left-0 z-50 border-t backdrop-blur-sm md:hidden">
                 <div className="container mx-auto px-4">
                     <div className="flex h-16 items-center justify-around">
                         {navItems.map((item) => {
@@ -126,7 +153,7 @@ export function NavBar() {
                                                     transition={{
                                                         duration: 0.2,
                                                     }}
-                                                    className="bg-primary/10 border-primary/20 absolute inset-0 -m-1 rounded-full border"
+                                                    className="border-primary/20 bg-primary/10 absolute inset-0 -m-1 rounded-full border"
                                                 />
                                             )}
                                         </AnimatePresence>
@@ -144,6 +171,18 @@ export function NavBar() {
                                 </Link>
                             );
                         })}
+                        {/* Mobile Logout Button */}
+                        <button
+                            onClick={handleLogout}
+                            className="relative flex w-16 flex-col items-center justify-center space-y-1 py-2"
+                        >
+                            <div className="relative">
+                                <LogOut className="text-muted-foreground h-5 w-5 transition-colors duration-200" />
+                            </div>
+                            <span className="text-muted-foreground font-mono text-xs transition-colors duration-200">
+                                {'>'} Logout
+                            </span>
+                        </button>
                     </div>
                 </div>
             </nav>

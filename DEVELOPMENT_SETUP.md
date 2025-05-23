@@ -50,12 +50,24 @@ The project requires environment variables for database connections and applicat
     DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE_NAME"
     NEXT_PUBLIC_APP_URL="http://localhost:3000"
 
+    # Google OAuth (for better-auth)
+    # Get these from https://console.developers.google.com/
+    GOOGLE_CLIENT_ID="your-google-client-id"
+    GOOGLE_CLIENT_SECRET="your-google-client-secret"
+
     # Example for a local PostgreSQL setup:
     # DATABASE_URL="postgresql://postgres:mysecretpassword@localhost:5432/race_dev"
     ```
 
     - Replace `USER`, `PASSWORD`, `HOST`, `PORT`, and `DATABASE_NAME` with your actual PostgreSQL credentials and database details.
     - `NEXT_PUBLIC_APP_URL` is used by Next.js and better-auth for constructing absolute URLs.
+    - For Google OAuth setup:
+        1. Go to the [Google Cloud Console](https://console.developers.google.com/)
+        2. Create a new project or select an existing one
+        3. Enable the Google+ API
+        4. Create OAuth 2.0 credentials (Web application type)
+        5. Add `http://localhost:3000/api/auth/callback/google` to authorized redirect URIs
+        6. Copy the Client ID and Client Secret to your `.env` file
 
     The project uses Zod for environment variable validation (see `src/lib/env.ts`). The application will not start if required variables are missing or invalid.
 

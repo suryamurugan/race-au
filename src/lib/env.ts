@@ -7,6 +7,9 @@ import { z } from 'zod';
 const serverSchema = z.object({
     NODE_ENV: z.enum(['development', 'test', 'production']),
     DATABASE_URL: z.string().url(),
+    GOOGLE_CLIENT_ID: z.string().min(1),
+    GOOGLE_CLIENT_SECRET: z.string().min(1),
+    NEXT_PUBLIC_APP_URL: z.string().url(),
     // Example:
     // NEXTAUTH_SECRET: z.string().min(1),
 });
@@ -16,6 +19,7 @@ const serverSchema = z.object({
  * Add all required public env vars here (must start with NEXT_PUBLIC_)
  */
 const clientSchema = z.object({
+    NEXT_PUBLIC_APP_URL: z.string().url(),
     // Example:
     // NEXT_PUBLIC_API_URL: z.string().url(),
 });
@@ -25,6 +29,9 @@ function getServerEnv() {
     const currentEnv = {
         NODE_ENV: process.env.NODE_ENV,
         DATABASE_URL: process.env.DATABASE_URL,
+        GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
+        GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+        NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
     };
 
     const parsed = serverSchema.safeParse(process.env);

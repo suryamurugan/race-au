@@ -25,6 +25,13 @@ export const auth = betterAuth({
             impersonationSessionDuration: 60 * 60 * 24,
         }),
     ],
+    socialProviders: {
+        google: {
+            clientId: process.env.GOOGLE_CLIENT_ID!,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+            redirectURI: `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/callback/google`,
+        },
+    },
     emailVerification: {
         sendVerificationEmail: async ({ user, url }) => {
             const { subject, html } = createVerificationEmail(url);
