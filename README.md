@@ -17,7 +17,7 @@ A modern full-stack boilerplate project built with cutting-edge technologies:
 > curl -fsSL https://get.pnpm.io/install.sh | sh -
 > ```
 
-First, install dependencies using pnpm:
+First, install dependencies using pnpm :
 
 ```bash
 pnpm install
