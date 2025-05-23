@@ -37,7 +37,10 @@ export const taskService = {
         teamId: string;
     }) {
         console.log('Getting all submissions for:', { taskId, teamId });
-        const result = await taskRepo.getAllSubmissions({ taskId, teamId });
+        const result = await taskRepo.getAllSubmissionsWithSubmitter({
+            taskId,
+            teamId,
+        });
         console.log('Found submissions:', result);
         return result;
     },

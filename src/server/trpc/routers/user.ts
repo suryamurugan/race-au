@@ -1,6 +1,6 @@
 import { protectedProcedure, router } from '../trpc';
 import { db } from '@/server/db';
-import { taskSubmissions, users } from '@/server/db/schema';
+import { taskSubmissions, users, teams, teamMembers } from '@/server/db/schema';
 import { eq, sql } from 'drizzle-orm';
 
 export const userRouter = router({
@@ -50,5 +50,22 @@ export const userRouter = router({
             totalPoints: Number(pointsResult[0]?.total || 0),
             recentActivity,
         };
+    }),
+
+    teams: protectedProcedure.query(async ({ ctx }) => {
+        const userId = ctx.session.user.id;
+
+        // Get all teams the user is a member of
+        const userTeams = await db
+            .select({
+                team: teams,
+                role: teamMembers.role,
+                joinedAt: teamMembers.joinedAt,
+            })
+            .from(teamMembers)
+            .innerJoin(teams, eq(teamMembers.teamId, teams.id))
+            .where(eq(teamMembers.userId, userId));
+
+        return userTeams;
     }),
 });

@@ -1,5 +1,5 @@
 import { db } from '@/server/db';
-import { taskSubmissions, tasks } from '@/server/db/schema';
+import { taskSubmissions, tasks, users } from '@/server/db/schema';
 import { eq, and, InferSelectModel, desc, inArray } from 'drizzle-orm';
 
 export type Task = InferSelectModel<typeof tasks>;
@@ -73,6 +73,49 @@ export const taskRepo = {
         const result = await db
             .select()
             .from(taskSubmissions)
+            .where(
+                and(
+                    eq(taskSubmissions.taskId, taskId),
+                    eq(taskSubmissions.teamId, teamId),
+                ),
+            )
+            .orderBy(desc(taskSubmissions.submittedAt));
+        console.log('Found submissions:', result);
+        return result;
+    },
+
+    async getAllSubmissionsWithSubmitter({
+        taskId,
+        teamId,
+    }: {
+        taskId: string;
+        teamId: string;
+    }) {
+        console.log('Getting all submissions with submitter for:', {
+            taskId,
+            teamId,
+        });
+        const result = await db
+            .select({
+                id: taskSubmissions.id,
+                taskId: taskSubmissions.taskId,
+                teamId: taskSubmissions.teamId,
+                submittedBy: taskSubmissions.submittedBy,
+                answer: taskSubmissions.answer,
+                status: taskSubmissions.status,
+                points: taskSubmissions.points,
+                feedback: taskSubmissions.feedback,
+                submittedAt: taskSubmissions.submittedAt,
+                updatedAt: taskSubmissions.updatedAt,
+                submitter: {
+                    id: users.id,
+                    name: users.name,
+                    email: users.email,
+                    image: users.image,
+                },
+            })
+            .from(taskSubmissions)
+            .innerJoin(users, eq(taskSubmissions.submittedBy, users.id))
             .where(
                 and(
                     eq(taskSubmissions.taskId, taskId),

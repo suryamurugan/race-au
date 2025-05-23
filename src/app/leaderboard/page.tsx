@@ -1,5 +1,5 @@
 import { db } from '@/server/db';
-import { challenge, teamProgress, teams } from '@/server/db/schema';
+import { challenge, taskSubmissions, teams } from '@/server/db/schema';
 import { desc, eq, sql } from 'drizzle-orm';
 import { SelectChallenge } from './select-challenge';
 import { Trophy, Users, Star, CheckCircle, TrendingUp } from 'lucide-react';
@@ -12,15 +12,17 @@ async function getLeaderboardData(challengeId: string | null) {
         .select({
             teamId: teams.id,
             teamName: teams.name,
-            totalPoints: sql<number>`sum(${teamProgress.totalPoints})`.as(
-                'total_points',
-            ),
-            completedTasks: sql<number>`sum(${teamProgress.completedTasks})`.as(
-                'completed_tasks',
-            ),
+            totalPoints:
+                sql<number>`COALESCE(SUM(CASE WHEN ${taskSubmissions.status} = 'correct' THEN ${taskSubmissions.points} ELSE 0 END), 0)`.as(
+                    'total_points',
+                ),
+            completedTasks:
+                sql<number>`COALESCE(COUNT(DISTINCT CASE WHEN ${taskSubmissions.status} = 'correct' THEN ${taskSubmissions.taskId} END), 0)`.as(
+                    'completed_tasks',
+                ),
         })
         .from(teams)
-        .leftJoin(teamProgress, eq(teams.id, teamProgress.teamId))
+        .leftJoin(taskSubmissions, eq(teams.id, taskSubmissions.teamId))
         .where(challengeId ? eq(teams.challengeId, challengeId) : undefined)
         .groupBy(teams.id, teams.name)
         .orderBy(desc(sql`total_points`));
