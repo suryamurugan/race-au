@@ -21,12 +21,25 @@ const clientSchema = z.object({
 });
 
 function getServerEnv() {
+    // Log all environment variables
+    const currentEnv = {
+        NODE_ENV: process.env.NODE_ENV,
+        DATABASE_URL: process.env.DATABASE_URL,
+    };
+
     const parsed = serverSchema.safeParse(process.env);
     if (!parsed.success) {
-        console.error(
-            '❌ Invalid server environment variables:',
-            parsed.error.flatten().fieldErrors,
-        );
+        console.error('\nEnvironment Variables Status:');
+        console.error('----------------------------');
+        Object.entries(currentEnv).forEach(([key, value]) => {
+            console.error(`${key}: ${value ? '✅ Present' : '❌ Missing'}`);
+            if (value) {
+                console.error(`  Value: ${value}`);
+            }
+        });
+        console.error('\nValidation Errors:');
+        console.error('------------------');
+        console.error(parsed.error.flatten().fieldErrors);
         throw new Error('Invalid server environment variables');
     }
     return parsed.data;

@@ -1,5 +1,6 @@
+import { appRouter } from '@/server/trpc/routers/_app';
+import { createContext } from '@/server/trpc/trpc';
 import { fetchRequestHandler } from '@trpc/server/adapters/fetch';
-import { appRouter, createContext } from '@/server/trpc/router';
 
 // Next.js App Router handler
 export async function GET(request: Request) {

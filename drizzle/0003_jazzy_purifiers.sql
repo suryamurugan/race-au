@@ -1,0 +1,1 @@
+ALTER TABLE "teams" ALTER COLUMN "challenge_id" DROP NOT NULL;
