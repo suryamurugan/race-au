@@ -643,12 +643,7 @@ export default function ChallengePage() {
         const task = selectedModule?.tasks.find((t) => t.id === taskId);
         if (!task) return;
 
-        // Only allow selection if the task is available
-        if (!isTaskAvailable(task, moduleSubmissions)) {
-            toast.error('Complete the previous tasks first!');
-            return;
-        }
-
+        // Since we only show available tasks, no need to check availability
         if (taskId !== selectedTaskId) {
             setIsTransitioning(true);
             setSelectedTaskId(taskId);
@@ -693,7 +688,7 @@ export default function ChallengePage() {
         (t) => t.id === selectedTaskId,
     );
 
-    // Update the task list rendering to show locked/unlocked state
+    // Update the task list rendering to show only available tasks
     const renderTaskList = () => {
         if (!selectedModule) {
             return (
@@ -703,33 +698,107 @@ export default function ChallengePage() {
             );
         }
 
-        // Sort tasks by order
+        // Sort tasks by order and filter to show only available tasks
         const sortedTasks = [...selectedModule.tasks].sort(
             (a, b) => a.order - b.order,
         );
 
-        return sortedTasks.map((task) => {
+        // Check if all tasks are completed
+        const completedTasks = moduleSubmissions.filter(
+            (sub: TaskSubmission) => sub.status === 'correct',
+        );
+        const allTasksCompleted =
+            sortedTasks.length > 0 &&
+            completedTasks.length === sortedTasks.length;
+
+        // Find next module
+        const currentModuleIndex =
+            challenge?.modules.findIndex((m) => m.id === selectedModuleId) ??
+            -1;
+        const nextModule = challenge?.modules[currentModuleIndex + 1];
+
+        // If all tasks are completed, show completion message
+        if (allTasksCompleted) {
+            return (
+                <div className="animate-in fade-in-50 space-y-4 pt-4 duration-300">
+                    <div className="text-center">
+                        <div className="mb-4 rounded-lg border border-green-500/20 bg-green-500/10 p-4">
+                            <div className="mb-2 flex items-center justify-center gap-2">
+                                <Check className="h-5 w-5 text-green-500" />
+                                <span className="text-sm font-medium text-green-500">
+                                    Module Completed!
+                                </span>
+                            </div>
+                            <p className="text-muted-foreground text-xs">
+                                All tasks in this module have been completed.
+                            </p>
+                        </div>
+
+                        {nextModule ? (
+                            <div className="space-y-2">
+                                <p className="text-muted-foreground font-mono text-xs">
+                                    {'>'} Next: {nextModule.title}
+                                </p>
+                                <button
+                                    onClick={() =>
+                                        handleModuleSelect(nextModule.id)
+                                    }
+                                    className="bg-primary hover:bg-primary/90 text-primary-foreground rounded px-3 py-1.5 text-xs font-medium transition-colors"
+                                    disabled={!isModuleAvailable(nextModule.id)}
+                                >
+                                    {isModuleAvailable(nextModule.id)
+                                        ? 'Continue to Next Module'
+                                        : 'Next Module Locked'}
+                                </button>
+                            </div>
+                        ) : (
+                            <div className="rounded-lg border border-blue-500/20 bg-blue-500/10 p-3">
+                                <p className="text-xs font-medium text-blue-500">
+                                    🎉 Challenge Completed!
+                                </p>
+                                <p className="text-muted-foreground mt-1 text-xs">
+                                    You have completed all modules in this
+                                    challenge.
+                                </p>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        }
+
+        // Filter tasks to show only those that are available
+        const availableTasks = sortedTasks.filter((task) =>
+            isTaskAvailable(task, moduleSubmissions),
+        );
+
+        if (availableTasks.length === 0) {
+            return (
+                <div className="text-muted-foreground animate-in fade-in-50 pt-4 text-center text-sm duration-300">
+                    No tasks available
+                </div>
+            );
+        }
+
+        return availableTasks.map((task) => {
             const isCompleted = moduleSubmissions.some(
                 (sub: TaskSubmission) =>
                     sub.taskId === task.id && sub.status === 'correct',
             );
-            const isAvailable = isTaskAvailable(task, moduleSubmissions);
 
             return (
                 <div
                     key={task.id}
                     className={cn(
-                        'transform rounded-md p-2 text-sm transition-all duration-300 ease-in-out',
+                        'hover:bg-muted transform cursor-pointer rounded-md p-2 text-sm transition-all duration-300 ease-in-out hover:scale-[1.01]',
                         selectedTaskId === task.id
                             ? 'bg-primary text-primary-foreground scale-[1.02]'
-                            : isAvailable
-                              ? 'hover:bg-muted cursor-pointer hover:scale-[1.01]'
-                              : 'cursor-not-allowed opacity-50',
+                            : '',
                         isTransitioning &&
                             selectedTaskId === task.id &&
                             'animate-in fade-in-50 duration-300',
                     )}
-                    onClick={() => isAvailable && handleTaskSelect(task.id)}
+                    onClick={() => handleTaskSelect(task.id)}
                 >
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
@@ -742,27 +811,6 @@ export default function ChallengePage() {
                             <span className="text-xs opacity-70">
                                 {task.points} pts
                             </span>
-                            {!isAvailable && (
-                                <svg
-                                    className="h-4 w-4 text-gray-400"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={2}
-                                        d="M12 15v2m0 0v2m0-2h2m-2 0H8"
-                                    />
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={2}
-                                        d="M12 2a10 10 0 0110 10c0 5.523-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2z"
-                                    />
-                                </svg>
-                            )}
                         </div>
                     </div>
                 </div>
