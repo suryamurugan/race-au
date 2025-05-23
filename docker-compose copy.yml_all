@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+    app:
+        build: .
+        ports:
+            - '3000:3000'
+        environment:
+            # Database
+            - DATABASE_URL=${DATABASE_URL}
+
+            # Authentication - Google OAuth
+            - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+            - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+
+            # Authentication - GitHub OAuth (optional)
+            - GITHUB_CLIENT_ID=${GITHUB_CLIENT_ID}
+            - GITHUB_CLIENT_SECRET=${GITHUB_CLIENT_SECRET}
+
+            # App Configuration
+            - NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
+
+            # Email Service
+            - RESEND_API_KEY=${RESEND_API_KEY}
+
+        # Alternative: Use env_file instead of individual environment variables
+        # env_file:
+        #   - .env.production
+
+        depends_on:
+            - db
+        networks:
+            - app-network
+
+    # Optional: Include PostgreSQL database service
+    db:
+        image: postgres:15-alpine
+        environment:
+            - POSTGRES_DB=${POSTGRES_DB:-race}
+            - POSTGRES_USER=${POSTGRES_USER:-postgres}
+            - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+        ports:
+            - '5432:5432'
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
+        networks:
+            - app-network
+
+networks:
+    app-network:
+        driver: bridge
+
+volumes:
+    postgres_data:
