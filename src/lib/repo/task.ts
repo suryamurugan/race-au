@@ -1,6 +1,14 @@
 import { db } from '@/server/db';
-import { taskSubmissions, tasks, users } from '@/server/db/schema';
-import { eq, and, InferSelectModel, desc, inArray } from 'drizzle-orm';
+import { taskSubmissions, tasks, users, modules } from '@/server/db/schema';
+import {
+    eq,
+    and,
+    InferSelectModel,
+    desc,
+    inArray,
+    sum,
+    sql,
+} from 'drizzle-orm';
 
 export type Task = InferSelectModel<typeof tasks>;
 export type TaskSubmission = InferSelectModel<typeof taskSubmissions>;
@@ -156,5 +164,40 @@ export const taskRepo = {
             .orderBy(desc(taskSubmissions.submittedAt));
 
         return result;
+    },
+
+    async getTeamChallengeScore({
+        challengeId,
+        teamId,
+    }: {
+        challengeId: string;
+        teamId: string;
+    }) {
+        // Get total points for a team in a specific challenge
+        const result = await db
+            .select({
+                totalPoints:
+                    sql<number>`COALESCE(SUM(CASE WHEN ${taskSubmissions.status} = 'correct' THEN ${taskSubmissions.points} ELSE 0 END), 0)`.as(
+                        'total_points',
+                    ),
+                completedTasks:
+                    sql<number>`COALESCE(COUNT(DISTINCT CASE WHEN ${taskSubmissions.status} = 'correct' THEN ${taskSubmissions.taskId} END), 0)`.as(
+                        'completed_tasks',
+                    ),
+            })
+            .from(taskSubmissions)
+            .innerJoin(tasks, eq(taskSubmissions.taskId, tasks.id))
+            .innerJoin(modules, eq(tasks.moduleId, modules.id))
+            .where(
+                and(
+                    eq(taskSubmissions.teamId, teamId),
+                    eq(modules.challengeId, challengeId),
+                ),
+            );
+
+        return {
+            totalPoints: Number(result[0]?.totalPoints || 0),
+            completedTasks: Number(result[0]?.completedTasks || 0),
+        };
     },
 };

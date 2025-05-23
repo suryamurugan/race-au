@@ -56,4 +56,16 @@ export const taskRouter = router({
                 await taskService.getAllModuleSubmissions(input);
             return submissions;
         }),
+
+    getTeamChallengeScore: protectedProcedure
+        .input(
+            z.object({
+                challengeId: z.string(),
+                teamId: z.string(),
+            }),
+        )
+        .query(async ({ input }) => {
+            const score = await taskService.getTeamChallengeScore(input);
+            return score;
+        }),
 });

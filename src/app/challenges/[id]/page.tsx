@@ -361,6 +361,18 @@ export default function ChallengePage() {
             challengeId: id as string,
         });
 
+    // Get team's total score for this challenge
+    const { data: teamScore, isLoading: isLoadingTeamScore } =
+        api.task.getTeamChallengeScore.useQuery(
+            {
+                challengeId: id as string,
+                teamId: team?.id as string,
+            },
+            {
+                enabled: !!team?.id,
+            },
+        );
+
     // Get team members from the team data
     const teamMembers = team?.members || [];
 
@@ -514,6 +526,12 @@ export default function ChallengePage() {
         // Clear cache for the current module
         delete moduleSubmissionsCache.current[selectedModuleId];
 
+        // Invalidate team score query to update the displayed score
+        await utils.task.getTeamChallengeScore.invalidate({
+            challengeId: id as string,
+            teamId: team.id,
+        });
+
         // Recheck availability for all modules
         setIsCheckingAvailability(true);
         try {
@@ -528,7 +546,14 @@ export default function ChallengePage() {
         } finally {
             setIsCheckingAvailability(false);
         }
-    }, [selectedModuleId, challenge, team, checkModuleAvailability]);
+    }, [
+        selectedModuleId,
+        challenge,
+        team,
+        checkModuleAvailability,
+        utils.task.getTeamChallengeScore,
+        id,
+    ]);
 
     const handleModuleSelect = async (moduleId: string) => {
         if (moduleId !== selectedModuleId) {
@@ -786,19 +811,39 @@ export default function ChallengePage() {
                         </div>
                         <div className="flex items-center gap-4">
                             {team ? (
-                                <div className="flex flex-col items-end">
+                                <div className="flex items-center gap-6">
                                     <div className="font-mono text-sm font-medium tracking-wider">
                                         {'>'} {team.name}
                                     </div>
+                                    <div className="text-muted-foreground flex items-center gap-3 font-mono text-xs">
+                                        <span>{'>'} Score:</span>
+                                        {isLoadingTeamScore ? (
+                                            <div className="bg-muted h-3 w-8 animate-pulse rounded"></div>
+                                        ) : (
+                                            <span className="text-primary font-medium">
+                                                {teamScore?.totalPoints || 0}{' '}
+                                                pts
+                                            </span>
+                                        )}
+                                        <span>•</span>
+                                        <span>Tasks:</span>
+                                        {isLoadingTeamScore ? (
+                                            <div className="bg-muted h-3 w-6 animate-pulse rounded"></div>
+                                        ) : (
+                                            <span className="text-primary font-medium">
+                                                {teamScore?.completedTasks || 0}
+                                            </span>
+                                        )}
+                                    </div>
                                     <div className="text-muted-foreground flex items-center gap-2 font-mono text-xs">
-                                        <span>{'>'} Team Members:</span>
-                                        <div className="flex -space-x-2">
+                                        <span>{'>'} Members:</span>
+                                        <div className="flex gap-1">
                                             {teamMembers.map(
                                                 (member: TeamMember) => (
                                                     <div
                                                         key={member.id}
-                                                        className="group relative"
-                                                        title={`${member.user.name} (${member.role})`}
+                                                        className="bg-muted/30 flex flex-shrink-0 items-center gap-1 rounded p-1"
+                                                        title={`${member.user.name} (${member.user.email}) - ${member.role}`}
                                                     >
                                                         {member.user.image ? (
                                                             <img
@@ -810,19 +855,27 @@ export default function ChallengePage() {
                                                                     member.user
                                                                         .name
                                                                 }
-                                                                className="border-background h-6 w-6 rounded-full border-2"
+                                                                className="border-background h-4 w-4 flex-shrink-0 rounded-full border"
                                                             />
                                                         ) : (
-                                                            <div className="bg-muted text-muted-foreground border-background flex h-6 w-6 items-center justify-center rounded-full border-2 text-xs">
+                                                            <div className="bg-primary/20 text-primary border-background flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full border text-[8px]">
                                                                 {
                                                                     member.user
                                                                         .name[0]
                                                                 }
                                                             </div>
                                                         )}
-                                                        <div className="absolute bottom-full left-1/2 mb-2 -translate-x-1/2 rounded bg-black px-2 py-1 text-xs whitespace-nowrap text-white opacity-0 transition-opacity group-hover:opacity-100">
-                                                            {member.user.name} (
-                                                            {member.role})
+                                                        <div className="text-foreground max-w-[60px] truncate text-[9px] leading-tight font-medium">
+                                                            {
+                                                                member.user.name.split(
+                                                                    ' ',
+                                                                )[0]
+                                                            }
+                                                        </div>
+                                                        <div className="text-primary text-[8px] font-medium">
+                                                            {member.role
+                                                                .charAt(0)
+                                                                .toUpperCase()}
                                                         </div>
                                                     </div>
                                                 ),

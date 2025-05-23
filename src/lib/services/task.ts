@@ -60,6 +60,21 @@ export const taskService = {
         return result;
     },
 
+    async getTeamChallengeScore({
+        challengeId,
+        teamId,
+    }: {
+        challengeId: string;
+        teamId: string;
+    }) {
+        const result = await taskRepo.getTeamChallengeScore({
+            challengeId,
+            teamId,
+        });
+        console.log('Found team challenge score:', result);
+        return result;
+    },
+
     async submitAnswer({
         taskId,
         teamId,
