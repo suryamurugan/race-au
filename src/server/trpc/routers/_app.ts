@@ -3,6 +3,7 @@ import { challengeRouter } from './challenge';
 import { userRouter } from './user';
 import { taskRouter } from './task';
 import { teamRouter } from './team';
+import { leaderboardRouter } from './leaderboard';
 
 // App router with example hello procedure
 export const appRouter = router({
@@ -11,6 +12,7 @@ export const appRouter = router({
     challenge: challengeRouter,
     task: taskRouter,
     team: teamRouter,
+    leaderboard: leaderboardRouter,
 });
 
 // Export type definition of API
