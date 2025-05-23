@@ -4,6 +4,7 @@ import './globals.css';
 import { ThemeProvider } from '@/providers/theme-provider';
 import { TRPCProvider } from '@/providers/trpc-provider';
 import { cn } from '@/lib/utils';
+import { NavBar } from '@/components/nav-bar';
 
 const geistSans = Geist({
     variable: '--font-geist-sans',
@@ -16,9 +17,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-    title: 'race',
-    description:
-        'Modern full-stack boilerplate with Next.js, tRPC, Drizzle, and better-auth',
+    title: 'Race',
+    description: 'A platform for coding challenges and competitions',
 };
 
 export default function RootLayout({
@@ -41,7 +41,10 @@ export default function RootLayout({
                     enableSystem
                     disableTransitionOnChange
                 >
-                    <TRPCProvider>{children}</TRPCProvider>
+                    <TRPCProvider>
+                        <NavBar />
+                        <main className="pb-16 md:pb-0">{children}</main>
+                    </TRPCProvider>
                 </ThemeProvider>
             </body>
         </html>
