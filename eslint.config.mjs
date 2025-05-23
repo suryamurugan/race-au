@@ -24,6 +24,9 @@ const eslintConfig = [
       "no-console": "warn",
       "no-unused-vars": "warn",
       "react/prop-types": "off",
+      "react/react-in-jsx-scope": "off",
+      "@typescript-eslint/no-unused-vars": "warn",
+      "@typescript-eslint/no-empty-object-type": "off",
       "import/order": ["warn", { "alphabetize": { "order": "asc" } }]
     }
   }

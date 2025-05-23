@@ -504,11 +504,12 @@ export default function ChallengePage() {
             setIsCheckingAvailability(true);
             try {
                 const availability: Record<string, boolean> = {};
-                for (const module of challenge.modules) {
-                    availability[module.id] = await checkModuleAvailability(
-                        module,
-                        challenge,
-                    );
+                for (const challengeModule of challenge.modules) {
+                    availability[challengeModule.id] =
+                        await checkModuleAvailability(
+                            challengeModule,
+                            challenge,
+                        );
                 }
                 setModuleAvailability(availability);
             } finally {
@@ -536,11 +537,9 @@ export default function ChallengePage() {
         setIsCheckingAvailability(true);
         try {
             const availability: Record<string, boolean> = {};
-            for (const module of challenge.modules) {
-                availability[module.id] = await checkModuleAvailability(
-                    module,
-                    challenge,
-                );
+            for (const challengeModule of challenge.modules) {
+                availability[challengeModule.id] =
+                    await checkModuleAvailability(challengeModule, challenge);
             }
             setModuleAvailability(availability);
         } finally {
@@ -557,8 +556,10 @@ export default function ChallengePage() {
 
     const handleModuleSelect = async (moduleId: string) => {
         if (moduleId !== selectedModuleId) {
-            const module = challenge?.modules.find((m) => m.id === moduleId);
-            if (!module || !challenge) return;
+            const challengeModule = challenge?.modules.find(
+                (m) => m.id === moduleId,
+            );
+            if (!challengeModule || !challenge) return;
 
             // Check if module is already marked as available
             if (moduleAvailability[moduleId]) {
@@ -572,7 +573,7 @@ export default function ChallengePage() {
 
             // If not available, check availability
             const isAvailable = await checkModuleAvailability(
-                module,
+                challengeModule,
                 challenge,
             );
             if (!isAvailable) {

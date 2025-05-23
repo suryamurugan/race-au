@@ -57,9 +57,17 @@ export function testPointsConfetti() {
     });
 }
 
+interface WindowWithTestConfetti extends Window {
+    testConfetti?: {
+        rankUp: () => void;
+        newTeam: () => void;
+        points: () => void;
+    };
+}
+
 // Make functions available globally for testing
 if (typeof window !== 'undefined') {
-    (window as any).testConfetti = {
+    (window as WindowWithTestConfetti).testConfetti = {
         rankUp: testRankUpConfetti,
         newTeam: testNewTeamConfetti,
         points: testPointsConfetti,
