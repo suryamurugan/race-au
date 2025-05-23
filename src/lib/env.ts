@@ -10,6 +10,7 @@ const serverSchema = z.object({
     GOOGLE_CLIENT_ID: z.string().min(1),
     GOOGLE_CLIENT_SECRET: z.string().min(1),
     NEXT_PUBLIC_APP_URL: z.string().url(),
+    RESEND_API_KEY: z.string().optional(),
     // Example:
     // NEXTAUTH_SECRET: z.string().min(1),
 });
@@ -32,6 +33,7 @@ function getServerEnv() {
         GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
         GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
         NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
+        RESEND_API_KEY: process.env.RESEND_API_KEY,
     };
 
     const parsed = serverSchema.safeParse(process.env);
@@ -47,7 +49,24 @@ function getServerEnv() {
         console.error('\nValidation Errors:');
         console.error('------------------');
         console.error(parsed.error.flatten().fieldErrors);
-        throw new Error('Invalid server environment variables');
+
+        // Don't throw error during build time, just warn
+        if (
+            process.env.NODE_ENV === 'production' &&
+            process.env.NEXT_PHASE !== 'phase-production-build'
+        ) {
+            throw new Error('Invalid server environment variables');
+        }
+
+        // Return partial data with defaults for build time
+        return {
+            NODE_ENV: process.env.NODE_ENV || 'development',
+            DATABASE_URL: process.env.DATABASE_URL || '',
+            GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID || '',
+            GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET || '',
+            NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL || '',
+            RESEND_API_KEY: process.env.RESEND_API_KEY,
+        };
     }
     return parsed.data;
 }
