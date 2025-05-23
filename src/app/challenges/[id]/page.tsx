@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { api } from '@/trpc/react';
 import { useParams } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
-import { ChevronLeft, Calendar, Check, X } from 'lucide-react';
+import { ChevronLeft, Calendar, Check, X, Timer } from 'lucide-react';
 import Link from 'next/link';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
@@ -108,6 +108,198 @@ interface TaskSubmission {
     feedback: string | null;
     submittedAt: Date;
     updatedAt: Date;
+}
+
+function Stopwatch({ startDate }: { startDate: Date }) {
+    const [elapsedTime, setElapsedTime] = useState<string>('00:00:00');
+
+    useEffect(() => {
+        const updateElapsedTime = () => {
+            const now = new Date();
+            const elapsed = now.getTime() - startDate.getTime();
+
+            if (elapsed < 0) {
+                setElapsedTime('00:00:00');
+                return;
+            }
+
+            const totalSeconds = Math.floor(elapsed / 1000);
+            const hours = Math.floor(totalSeconds / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const seconds = totalSeconds % 60;
+
+            const formatTime = (num: number) => num.toString().padStart(2, '0');
+
+            if (hours >= 24) {
+                const days = Math.floor(hours / 24);
+                const remainingHours = hours % 24;
+                setElapsedTime(
+                    `${days}d ${formatTime(remainingHours)}:${formatTime(minutes)}:${formatTime(seconds)}`,
+                );
+            } else {
+                setElapsedTime(
+                    `${formatTime(hours)}:${formatTime(minutes)}:${formatTime(seconds)}`,
+                );
+            }
+        };
+
+        updateElapsedTime();
+        const interval = setInterval(updateElapsedTime, 1000);
+
+        return () => clearInterval(interval);
+    }, [startDate]);
+
+    return (
+        <div className="flex items-center gap-2 font-mono text-sm">
+            <Timer className="text-primary h-4 w-4" />
+            <span className="text-muted-foreground">Elapsed:</span>
+            <span className="text-primary font-medium">{elapsedTime}</span>
+        </div>
+    );
+}
+
+function CountdownTimer({ startDate }: { startDate: Date }) {
+    const [timeLeft, setTimeLeft] = useState<string>('00:00:00');
+    const [hasStarted, setHasStarted] = useState(false);
+
+    useEffect(() => {
+        const updateCountdown = () => {
+            const now = new Date();
+            const timeRemaining = startDate.getTime() - now.getTime();
+
+            if (timeRemaining <= 0) {
+                setTimeLeft('00:00:00');
+                setHasStarted(true);
+                // Reload the page when challenge starts
+                window.location.reload();
+                return;
+            }
+
+            const totalSeconds = Math.floor(timeRemaining / 1000);
+            const days = Math.floor(totalSeconds / (24 * 3600));
+            const hours = Math.floor((totalSeconds % (24 * 3600)) / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const seconds = totalSeconds % 60;
+
+            const formatTime = (num: number) => num.toString().padStart(2, '0');
+
+            if (days > 0) {
+                setTimeLeft(
+                    `${days}d ${formatTime(hours)}:${formatTime(minutes)}:${formatTime(seconds)}`,
+                );
+            } else {
+                setTimeLeft(
+                    `${formatTime(hours)}:${formatTime(minutes)}:${formatTime(seconds)}`,
+                );
+            }
+        };
+
+        updateCountdown();
+        const interval = setInterval(updateCountdown, 1000);
+
+        return () => clearInterval(interval);
+    }, [startDate]);
+
+    if (hasStarted) {
+        return null;
+    }
+
+    return (
+        <div className="bg-primary/10 border-primary/20 space-y-2 rounded-lg border p-4">
+            <p className="text-muted-foreground font-mono text-xs">
+                Time until start:
+            </p>
+            <div className="flex items-center justify-center gap-2">
+                <Timer className="text-primary h-5 w-5" />
+                <span className="text-primary font-mono text-xl font-bold">
+                    {timeLeft}
+                </span>
+            </div>
+        </div>
+    );
+}
+
+function ChallengeEndWarning({ endDate }: { endDate: Date }) {
+    const [timeLeft, setTimeLeft] = useState<string>('');
+    const [showWarning, setShowWarning] = useState(false);
+
+    useEffect(() => {
+        const updateWarning = () => {
+            const now = new Date();
+            const timeRemaining = endDate.getTime() - now.getTime();
+
+            // Show warning if less than 30 minutes (1800000 ms) remaining
+            const thirtyMinutesInMs = 30 * 60 * 1000;
+
+            if (timeRemaining <= 0) {
+                setShowWarning(false);
+                return;
+            }
+
+            if (timeRemaining <= thirtyMinutesInMs) {
+                setShowWarning(true);
+
+                const totalSeconds = Math.floor(timeRemaining / 1000);
+                const hours = Math.floor(totalSeconds / 3600);
+                const minutes = Math.floor((totalSeconds % 3600) / 60);
+                const seconds = totalSeconds % 60;
+
+                const formatTime = (num: number) =>
+                    num.toString().padStart(2, '0');
+
+                if (hours > 0) {
+                    setTimeLeft(
+                        `${formatTime(hours)}:${formatTime(minutes)}:${formatTime(seconds)}`,
+                    );
+                } else {
+                    setTimeLeft(
+                        `${formatTime(minutes)}:${formatTime(seconds)}`,
+                    );
+                }
+            } else {
+                setShowWarning(false);
+            }
+        };
+
+        updateWarning();
+        const interval = setInterval(updateWarning, 1000);
+
+        return () => clearInterval(interval);
+    }, [endDate]);
+
+    if (!showWarning) {
+        return null;
+    }
+
+    return (
+        <div className="animate-pulse space-y-2 rounded-lg border border-red-500/20 bg-red-500/10 p-4">
+            <div className="flex items-center gap-2">
+                <svg
+                    className="h-5 w-5 text-red-500"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                >
+                    <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"
+                    />
+                </svg>
+                <p className="font-mono text-sm font-semibold text-red-500">
+                    ⚠️ Challenge Ending Soon!
+                </p>
+            </div>
+            <div className="text-muted-foreground font-mono text-xs">
+                Time remaining:{' '}
+                <span className="font-semibold text-red-500">{timeLeft}</span>
+            </div>
+            <p className="text-muted-foreground font-mono text-xs">
+                Please complete your submissions before the deadline.
+            </p>
+        </div>
+    );
 }
 
 function SubmissionHistory({
@@ -685,6 +877,252 @@ export default function ChallengePage() {
         );
     }
 
+    // Check if challenge has started
+    const now = new Date();
+    const challengeStartDate = new Date(challenge.startDate);
+    const challengeEndDate = new Date(challenge.endDate);
+    const hasStarted = now >= challengeStartDate;
+    const hasEnded = now >= challengeEndDate;
+
+    if (!hasStarted) {
+        return (
+            <div className="relative flex min-h-[calc(100vh-4rem)] flex-col">
+                <CircuitPattern />
+                <GridOverlay />
+
+                <div className="relative z-10 border-b">
+                    <div className="container mx-auto px-4">
+                        <div className="flex items-center justify-between py-4">
+                            <div className="flex items-center gap-6">
+                                <Link
+                                    href="/challenges"
+                                    className="text-muted-foreground hover:text-primary flex items-center text-sm transition-colors"
+                                >
+                                    <ChevronLeft className="h-4 w-4" />
+                                </Link>
+                                <div>
+                                    <h1 className="font-mono text-lg font-semibold tracking-wider">
+                                        {'>'} {challenge.title}
+                                    </h1>
+                                    <div className="text-muted-foreground flex items-center gap-3 font-mono text-sm">
+                                        <Calendar className="h-3.5 w-3.5" />
+                                        <span>
+                                            Starts:{' '}
+                                            {format(challengeStartDate, 'PP p')}
+                                        </span>
+                                        <span>→</span>
+                                        <span>
+                                            {format(
+                                                new Date(challenge.endDate),
+                                                'PP',
+                                            )}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <Badge
+                                variant="secondary"
+                                className="px-2 py-0.5 font-mono"
+                            >
+                                {'>'} Waiting to Start
+                            </Badge>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="relative z-10 flex flex-1 items-center justify-center">
+                    <div className="max-w-md space-y-6 text-center">
+                        <div className="space-y-4">
+                            <Timer className="text-primary mx-auto h-16 w-16" />
+                            <h2 className="font-mono text-2xl font-semibold tracking-wider">
+                                {'>'} Challenge Not Started
+                            </h2>
+                        </div>
+
+                        <div className="bg-card border-primary/20 space-y-4 rounded-lg border p-6">
+                            <p className="text-muted-foreground font-mono text-sm">
+                                This challenge will begin at:
+                            </p>
+                            <div className="text-primary font-mono text-lg font-semibold">
+                                {format(challengeStartDate, 'PPPP p')}
+                            </div>
+                            <div className="text-muted-foreground font-mono text-xs">
+                                Please check back at the scheduled start time.
+                            </div>
+                        </div>
+
+                        <CountdownTimer startDate={challengeStartDate} />
+
+                        <ChallengeEndWarning
+                            endDate={new Date(challenge.endDate)}
+                        />
+
+                        {challenge.description && (
+                            <div className="bg-muted/30 rounded-lg p-4">
+                                <h3 className="mb-2 font-mono text-sm font-medium tracking-wider">
+                                    {'>'} Challenge Description
+                                </h3>
+                                <div className="text-muted-foreground text-sm">
+                                    <TiptapViewer
+                                        content={challenge.description}
+                                        className="document-preview prose-headings:text-foreground prose-p:text-foreground prose-headings:font-mono prose-p:font-mono text-sm"
+                                    />
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    if (hasEnded) {
+        return (
+            <div className="relative flex min-h-[calc(100vh-4rem)] flex-col">
+                <CircuitPattern />
+                <GridOverlay />
+
+                <div className="relative z-10 border-b">
+                    <div className="container mx-auto px-4">
+                        <div className="flex items-center justify-between py-4">
+                            <div className="flex items-center gap-6">
+                                <Link
+                                    href="/challenges"
+                                    className="text-muted-foreground hover:text-primary flex items-center text-sm transition-colors"
+                                >
+                                    <ChevronLeft className="h-4 w-4" />
+                                </Link>
+                                <div>
+                                    <h1 className="font-mono text-lg font-semibold tracking-wider">
+                                        {'>'} {challenge.title}
+                                    </h1>
+                                    <div className="text-muted-foreground flex items-center gap-3 font-mono text-sm">
+                                        <Calendar className="h-3.5 w-3.5" />
+                                        <span>
+                                            Started:{' '}
+                                            {format(challengeStartDate, 'PP p')}
+                                        </span>
+                                        <span>→</span>
+                                        <span>
+                                            Ended:{' '}
+                                            {format(challengeEndDate, 'PP p')}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <Badge
+                                variant="destructive"
+                                className="px-2 py-0.5 font-mono"
+                            >
+                                {'>'} Challenge Ended
+                            </Badge>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="relative z-10 flex flex-1 items-center justify-center">
+                    <div className="max-w-md space-y-6 text-center">
+                        <div className="space-y-4">
+                            <svg
+                                className="mx-auto h-16 w-16 text-green-500"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                                />
+                            </svg>
+                            <h2 className="font-mono text-2xl font-semibold tracking-wider">
+                                {'>'} Challenge Completed
+                            </h2>
+                        </div>
+
+                        <div className="bg-card border-primary/20 space-y-4 rounded-lg border p-6">
+                            <p className="text-muted-foreground font-mono text-sm">
+                                This challenge ended at:
+                            </p>
+                            <div className="text-primary font-mono text-lg font-semibold">
+                                {format(challengeEndDate, 'PPPP p')}
+                            </div>
+                            <div className="text-muted-foreground font-mono text-xs">
+                                All submissions are now closed.
+                            </div>
+                        </div>
+
+                        <div className="space-y-4 rounded-lg border border-green-500/20 bg-green-500/10 p-6">
+                            <div className="flex items-center justify-center gap-2">
+                                <svg
+                                    className="h-6 w-6 text-green-500"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                                    />
+                                </svg>
+                                <h3 className="font-mono text-lg font-semibold text-green-500">
+                                    Check the Results!
+                                </h3>
+                            </div>
+                            <p className="text-muted-foreground font-mono text-sm">
+                                Visit the leaderboard to see final scores and
+                                rankings.
+                            </p>
+                            <Link
+                                href={`/leaderboard?challenge=${challenge.id}`}
+                                className="inline-block rounded-lg bg-green-500 px-4 py-2 font-mono text-sm font-medium text-white transition-colors hover:bg-green-600"
+                            >
+                                {'>'} View Leaderboard
+                            </Link>
+                        </div>
+
+                        {team && teamScore && (
+                            <div className="bg-muted/30 rounded-lg p-4">
+                                <h3 className="mb-3 font-mono text-sm font-medium tracking-wider">
+                                    {'>'} Your Team Performance
+                                </h3>
+                                <div className="space-y-2 text-sm">
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-muted-foreground font-mono">
+                                            Team:
+                                        </span>
+                                        <span className="text-primary font-mono font-semibold">
+                                            {team.name}
+                                        </span>
+                                    </div>
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-muted-foreground font-mono">
+                                            Final Score:
+                                        </span>
+                                        <span className="text-primary font-mono font-semibold">
+                                            {teamScore.totalPoints} pts
+                                        </span>
+                                    </div>
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-muted-foreground font-mono">
+                                            Tasks Completed:
+                                        </span>
+                                        <span className="text-primary font-mono font-semibold">
+                                            {teamScore.completedTasks}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     const selectedTask = selectedModule?.tasks.find(
         (t) => t.id === selectedTaskId,
     );
@@ -841,11 +1279,12 @@ export default function ChallengePage() {
                                 <div className="text-muted-foreground flex items-center gap-3 font-mono text-sm">
                                     <Calendar className="h-3.5 w-3.5" />
                                     <span>
+                                        Started:{' '}
                                         {format(
                                             new Date(
                                                 challenge?.startDate || '',
                                             ),
-                                            'PP',
+                                            'PP p',
                                         )}
                                     </span>
                                     <span>→</span>
@@ -856,6 +1295,15 @@ export default function ChallengePage() {
                                         )}
                                     </span>
                                 </div>
+                                {challenge?.startDate && (
+                                    <div className="mt-1">
+                                        <Stopwatch
+                                            startDate={
+                                                new Date(challenge.startDate)
+                                            }
+                                        />
+                                    </div>
+                                )}
                             </div>
                         </div>
                         <div className="flex items-center gap-4">
@@ -957,7 +1405,8 @@ export default function ChallengePage() {
             </div>
 
             <div className="relative z-10 container mx-auto flex-1 px-4 py-4">
-                <div className="divide-primary/20 flex h-[calc(100vh-12rem)] divide-x">
+                <ChallengeEndWarning endDate={new Date(challenge.endDate)} />
+                <div className="divide-primary/20 mt-4 flex h-[calc(100vh-12rem)] divide-x">
                     {/* Modules List */}
                     <div className="w-[20%] pr-4">
                         <div className="mb-2 font-mono text-sm font-medium tracking-wider">
