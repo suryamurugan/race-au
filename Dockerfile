@@ -29,9 +29,11 @@ COPY . .
 
 # Accept build arguments
 ARG NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
+ARG BETTER_AUTH_SECRET=$BETTER_AUTH_SECRET
 # Set build-time environment variables from build arguments
 ENV NODE_ENV=production
 ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
+ENV BETTER_AUTH_SECRET=$BETTER_AUTH_SECRET
 ENV DATABASE_URL="postgresql://user:pass@host:5432/race"
 ENV GOOGLE_CLIENT_ID="build-time-placeholder"
 ENV GOOGLE_CLIENT_SECRET="build-time-placeholder"
@@ -57,6 +59,7 @@ ENV GOOGLE_CLIENT_ID="your_google_client_id"
 ENV GOOGLE_CLIENT_SECRET="your_google_client_secret"
 ENV NEXT_PUBLIC_APP_URL="http://127.0.0.1:3000"
 ENV RESEND_API_KEY="your_resend_api_key"
+ENV BETTER_AUTH_SECRET="your_better_auth_secret"
 
 # Optional environment variables
 ENV GITHUB_CLIENT_ID=""
