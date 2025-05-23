@@ -27,13 +27,26 @@ RUN npm install -g pnpm
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Set build-time environment variables with safe defaults
+# Accept build arguments
+ARG NEXT_PUBLIC_APP_URL="http://127.0.0.1:3000"
+ARG DATABASE_URL="postgresql://user:pass@host:5432/race"
+ARG GOOGLE_CLIENT_ID="build-time-placeholder"
+ARG GOOGLE_CLIENT_SECRET="build-time-placeholder"
+ARG RESEND_API_KEY="build-time-placeholder"
+ARG BETTER_AUTH_SECRET="build-time-placeholder"
+ARG GITHUB_CLIENT_ID=""
+ARG GITHUB_CLIENT_SECRET=""
+
+# Set build-time environment variables from build arguments
 ENV NODE_ENV=production
-ENV NEXT_PUBLIC_APP_URL="http://127.0.0.1:3000"
-ENV DATABASE_URL="postgresql://user:pass@host:5432/race"
-ENV GOOGLE_CLIENT_ID="build-time-placeholder"
-ENV GOOGLE_CLIENT_SECRET="build-time-placeholder"
-ENV RESEND_API_KEY="build-time-placeholder"
+ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
+ENV DATABASE_URL=$DATABASE_URL
+ENV GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID
+ENV GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET
+ENV RESEND_API_KEY=$RESEND_API_KEY
+ENV BETTER_AUTH_SECRET=$BETTER_AUTH_SECRET
+ENV GITHUB_CLIENT_ID=$GITHUB_CLIENT_ID
+ENV GITHUB_CLIENT_SECRET=$GITHUB_CLIENT_SECRET
 
 # Generate Drizzle types
 RUN pnpm run db:generate || echo "Skipping db:generate - may need database connection"
