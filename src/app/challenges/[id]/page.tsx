@@ -964,6 +964,7 @@ export default function ChallengePage() {
                                 </h3>
                                 <div className="text-muted-foreground text-sm">
                                     <TiptapViewer
+                                        key={challenge.id}
                                         content={challenge.description}
                                         className="document-preview prose-headings:text-foreground prose-p:text-foreground prose-headings:font-mono prose-p:font-mono text-sm"
                                     />
@@ -1229,10 +1230,10 @@ export default function ChallengePage() {
                 <div
                     key={task.id}
                     className={cn(
-                        'hover:bg-muted transform cursor-pointer rounded-md p-2 text-sm transition-all duration-300 ease-in-out hover:scale-[1.01]',
+                        'transform cursor-pointer rounded-md p-2 text-sm transition-all duration-300 ease-in-out',
                         selectedTaskId === task.id
-                            ? 'bg-primary text-primary-foreground scale-[1.02]'
-                            : '',
+                            ? 'bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground scale-[1.02]'
+                            : 'hover:bg-muted hover:scale-[1.01]',
                         isTransitioning &&
                             selectedTaskId === task.id &&
                             'animate-in fade-in-50 duration-300',
@@ -1499,6 +1500,7 @@ export default function ChallengePage() {
                                         </h3>
                                         <div className="mb-6">
                                             <TiptapViewer
+                                                key={selectedTask.id}
                                                 content={
                                                     selectedTask.description
                                                 }
