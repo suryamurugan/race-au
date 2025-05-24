@@ -16,6 +16,10 @@ import TiptapViewer from '@/components/tiptap-viewer';
 import { toast } from 'sonner';
 import { CircuitPattern } from '@/components/circuit-pattern';
 import { GridOverlay } from '@/components/grid-overlay';
+import {
+    usePageProtection,
+    useInputProtection,
+} from '@/hooks/useCopyPastePrevent';
 
 interface Task {
     id: string;
@@ -397,12 +401,27 @@ function OpenTextAnswer({
     const [answer, setAnswer] = useState('');
     const [isFocused, setIsFocused] = useState(false);
 
+    const handlePaste = (e: React.ClipboardEvent) => {
+        e.preventDefault();
+        toast.error('Copy and paste is disabled during challenges');
+    };
+
+    const handleCopy = (e: React.ClipboardEvent) => {
+        e.preventDefault();
+        toast.error('Copy and paste is disabled during challenges');
+    };
+
+    const handleContextMenu = (e: React.MouseEvent) => {
+        e.preventDefault();
+        toast.error('Right-click is disabled during challenges');
+    };
+
     return (
         <div className="space-y-4">
             <div className="relative">
                 <textarea
                     className={cn(
-                        'border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring min-h-[120px] w-full resize-none rounded-lg border px-3 py-2 text-sm transition-all duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50',
+                        'border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring secure-input min-h-[120px] w-full resize-none rounded-lg border px-3 py-2 text-sm transition-all duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50',
                         isFocused && 'shadow-lg',
                     )}
                     placeholder="Type your answer here..."
@@ -410,7 +429,11 @@ function OpenTextAnswer({
                     onChange={(e) => setAnswer(e.target.value)}
                     onFocus={() => setIsFocused(true)}
                     onBlur={() => setIsFocused(false)}
+                    onPaste={handlePaste}
+                    onCopy={handleCopy}
+                    onContextMenu={handleContextMenu}
                     disabled={isSubmitting}
+                    style={{ userSelect: 'text' }} // Allow text selection within input for usability
                 />
                 <div
                     className="text-muted-foreground absolute right-2 bottom-2 text-xs opacity-0 transition-opacity duration-200"
@@ -540,6 +563,9 @@ export default function ChallengePage() {
 
     // Cache for module submissions to avoid repeated API calls
     const moduleSubmissionsCache = useRef<Record<string, TaskSubmission[]>>({});
+
+    // Apply copy/paste protection to the entire page
+    usePageProtection();
 
     const utils = api.useUtils();
 
@@ -886,7 +912,7 @@ export default function ChallengePage() {
 
     if (!hasStarted) {
         return (
-            <div className="relative flex min-h-[calc(100vh-4rem)] flex-col">
+            <div className="no-copy-paste relative flex min-h-[calc(100vh-4rem)] flex-col">
                 <CircuitPattern />
                 <GridOverlay />
 
@@ -979,7 +1005,7 @@ export default function ChallengePage() {
 
     if (hasEnded) {
         return (
-            <div className="relative flex min-h-[calc(100vh-4rem)] flex-col">
+            <div className="no-copy-paste relative flex min-h-[calc(100vh-4rem)] flex-col">
                 <CircuitPattern />
                 <GridOverlay />
 
@@ -1259,7 +1285,7 @@ export default function ChallengePage() {
     };
 
     return (
-        <div className="relative flex min-h-[calc(100vh-4rem)] flex-col">
+        <div className="no-copy-paste relative flex min-h-[calc(100vh-4rem)] flex-col">
             <CircuitPattern />
             <GridOverlay />
 
