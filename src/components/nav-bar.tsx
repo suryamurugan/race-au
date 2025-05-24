@@ -13,12 +13,12 @@ const navItems = [
     { label: 'Home', href: '/', icon: Home },
     {
         label: 'Challenges',
-        href: '/challenges/0964f3be-9d95-4dab-9cae-487d67ed075a',
+        href: '/challenges/9f8586c1-bdd4-4f1d-b112-6449de4c530d',
         icon: Trophy,
     },
     {
         label: 'Leaderboard',
-        href: '/leaderboard?challenge=0964f3be-9d95-4dab-9cae-487d67ed075a',
+        href: '/leaderboard?challenge=9f8586c1-bdd4-4f1d-b112-6449de4c530d',
         icon: Award,
     },
     // { label: 'Profile', href: '/profile', icon: User },

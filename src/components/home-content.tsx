@@ -75,7 +75,7 @@ export function HomeContent({ userName }: { userName?: string | null }) {
                         transition={{ duration: 0.5, delay: 0.2 }}
                     >
                         <Link
-                            href="/challenges/0964f3be-9d95-4dab-9cae-487d67ed075a"
+                            href="/challenges/9f8586c1-bdd4-4f1d-b112-6449de4c530d"
                             className="group bg-primary text-primary-foreground inline-flex items-center gap-2 rounded-lg px-6 py-3 font-mono transition-all duration-200 hover:scale-105 hover:shadow-lg"
                         >
                             {'>'} ENTER CHALLENGE
