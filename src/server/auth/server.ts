@@ -8,6 +8,10 @@ import {
     createVerificationEmail,
     createResetPasswordEmail,
 } from '@/lib/email-templates';
+import { scrypt, randomBytes, timingSafeEqual } from 'crypto';
+import { promisify } from 'util';
+
+const scryptAsync = promisify(scrypt);
 
 if (!process.env.DATABASE_URL) {
     throw new Error('DATABASE_URL is not set');
@@ -44,6 +48,54 @@ export const auth = betterAuth({
     },
     emailAndPassword: {
         enabled: true,
+        password: {
+            hash: async (password: string): Promise<string> => {
+                // Add the same secret pepper used in seeding
+                const secret = 'race-cialabs-atria';
+                const passwordWithSecret = `${password}${secret}`;
+
+                // Use scrypt directly like Better Auth does
+                const salt = randomBytes(32);
+                const derivedKey = (await scryptAsync(
+                    passwordWithSecret,
+                    salt,
+                    64,
+                )) as Buffer;
+                return salt.toString('hex') + ':' + derivedKey.toString('hex');
+            },
+            verify: async ({ password, hash }): Promise<boolean> => {
+                // Add the same secret pepper for verification
+                const secret = 'race-cialabs-atria';
+                const passwordWithSecret = `${password}${secret}`;
+
+                console.log('🔐 Password verification started');
+                console.log('📝 Input password length:', password.length);
+                console.log('🔑 Hash length:', hash.length);
+
+                // Parse the stored hash
+                const [saltHex, keyHex] = hash.split(':');
+                const salt = Buffer.from(saltHex, 'hex');
+                const storedKey = Buffer.from(keyHex, 'hex');
+
+                console.log('🧂 Salt length:', salt.length);
+                console.log('🔑 Stored key length:', storedKey.length);
+
+                // Derive key from the provided password
+                const derivedKey = (await scryptAsync(
+                    passwordWithSecret,
+                    salt,
+                    64,
+                )) as Buffer;
+
+                console.log('🔑 Derived key length:', derivedKey.length);
+
+                // Use timing-safe comparison
+                const isValid = timingSafeEqual(storedKey, derivedKey);
+                console.log('✅ Password verification result:', isValid);
+
+                return isValid;
+            },
+        },
         // disableSignUp: false,
         // requireEmailVerification: false,
         // minPasswordLength: 8,
