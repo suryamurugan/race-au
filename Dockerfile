@@ -38,6 +38,8 @@ ENV DATABASE_URL="postgresql://user:pass@host:5432/race"
 ENV GOOGLE_CLIENT_ID="build-time-placeholder"
 ENV GOOGLE_CLIENT_SECRET="build-time-placeholder"
 ENV RESEND_API_KEY="build-time-placeholder"
+ENV GMAIL_USER=""
+ENV GMAIL_APP_PASSWORD=""
 
 # Generate Drizzle types
 RUN pnpm run db:generate || echo "Skipping db:generate - may need database connection"
@@ -60,6 +62,8 @@ ENV GOOGLE_CLIENT_SECRET="your_google_client_secret"
 ENV NEXT_PUBLIC_APP_URL="http://127.0.0.1:3000"
 ENV RESEND_API_KEY="your_resend_api_key"
 ENV BETTER_AUTH_SECRET="your_better_auth_secret"
+ENV GMAIL_USER=""
+ENV GMAIL_APP_PASSWORD=""
 
 # Optional environment variables
 ENV GITHUB_CLIENT_ID=""
