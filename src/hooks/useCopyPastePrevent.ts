@@ -5,21 +5,25 @@ import { toast } from 'sonner';
 export function useCopyPastePrevent() {
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
-            // Prevent copy/paste/cut shortcuts
+            // Prevent copy/cut shortcuts but ALLOW paste (v key removed)
             if (
                 (e.ctrlKey || e.metaKey) &&
-                (e.key === 'c' ||
-                    e.key === 'v' ||
-                    e.key === 'x' ||
-                    e.key === 'a')
+                (e.key === 'c' || e.key === 'x' || e.key === 'a')
             ) {
                 e.preventDefault();
-                toast.error(
-                    'Copy/paste operations are disabled during challenges',
-                    {
+                if (e.key === 'c') {
+                    toast.error('Copying is disabled during challenges', {
                         duration: 3000,
-                    },
-                );
+                    });
+                } else if (e.key === 'x') {
+                    toast.error('Cutting is disabled during challenges', {
+                        duration: 3000,
+                    });
+                } else if (e.key === 'a') {
+                    toast.error('Select all is disabled during challenges', {
+                        duration: 3000,
+                    });
+                }
             }
 
             // Prevent developer tools
@@ -41,13 +45,6 @@ export function useCopyPastePrevent() {
         const handleCopy = (e: ClipboardEvent) => {
             e.preventDefault();
             toast.error('Copying is disabled during challenges', {
-                duration: 3000,
-            });
-        };
-
-        const handlePaste = (e: ClipboardEvent) => {
-            e.preventDefault();
-            toast.error('Pasting is disabled during challenges', {
                 duration: 3000,
             });
         };
@@ -74,10 +71,9 @@ export function useCopyPastePrevent() {
             }
         };
 
-        // Add event listeners to document
+        // Add event listeners to document (no paste listener)
         document.addEventListener('keydown', handleKeyDown);
         document.addEventListener('copy', handleCopy);
-        document.addEventListener('paste', handlePaste);
         document.addEventListener('cut', handleCut);
         document.addEventListener('contextmenu', handleContextMenu);
         document.addEventListener('selectstart', handleSelectStart);
@@ -90,7 +86,6 @@ export function useCopyPastePrevent() {
         return () => {
             document.removeEventListener('keydown', handleKeyDown);
             document.removeEventListener('copy', handleCopy);
-            document.removeEventListener('paste', handlePaste);
             document.removeEventListener('cut', handleCut);
             document.removeEventListener('contextmenu', handleContextMenu);
             document.removeEventListener('selectstart', handleSelectStart);

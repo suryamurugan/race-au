@@ -401,14 +401,9 @@ function OpenTextAnswer({
     const [answer, setAnswer] = useState('');
     const [isFocused, setIsFocused] = useState(false);
 
-    const handlePaste = (e: React.ClipboardEvent) => {
-        e.preventDefault();
-        toast.error('Copy and paste is disabled during challenges');
-    };
-
     const handleCopy = (e: React.ClipboardEvent) => {
         e.preventDefault();
-        toast.error('Copy and paste is disabled during challenges');
+        toast.error('Copy is disabled during challenges');
     };
 
     const handleContextMenu = (e: React.MouseEvent) => {
@@ -429,7 +424,6 @@ function OpenTextAnswer({
                     onChange={(e) => setAnswer(e.target.value)}
                     onFocus={() => setIsFocused(true)}
                     onBlur={() => setIsFocused(false)}
-                    onPaste={handlePaste}
                     onCopy={handleCopy}
                     onContextMenu={handleContextMenu}
                     disabled={isSubmitting}
