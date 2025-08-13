@@ -106,15 +106,21 @@ export const taskService = {
                 : answer;
 
         // Check if the answer is correct
+        // Ensure correctAnswer is always an array
+        const correctAnswers = Array.isArray(task.correctAnswer)
+            ? task.correctAnswer
+            : [task.correctAnswer];
+
         const isCorrect =
             task.answerType === 'multiple_choice'
-                ? (task.correctAnswer as string[]).includes(
+                ? correctAnswers.includes(
                       (task.options as string[])[answer as number],
                   )
-                : (task.correctAnswer as string[]).some(
+                : correctAnswers.some(
                       (correct) =>
+                          typeof correct === 'string' &&
                           correct.toLowerCase() ===
-                          (answer as string).toLowerCase(),
+                              (answer as string).toLowerCase(),
                   );
 
         console.log('Answer validation:', {
