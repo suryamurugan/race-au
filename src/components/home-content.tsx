@@ -1,12 +1,12 @@
 'use client';
 
-import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { ArrowRight } from 'lucide-react';
-import { useEffect, useState, useRef } from 'react';
-import { cn } from '@/lib/utils';
 import { CircuitPattern } from '@/components/circuit-pattern';
 import { GridOverlay } from '@/components/grid-overlay';
+import { cn } from '@/lib/utils';
+import { motion } from 'framer-motion';
+import { ArrowRight } from 'lucide-react';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
 const HACKER_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()';
 
@@ -75,7 +75,7 @@ export function HomeContent({ userName }: { userName?: string | null }) {
                         transition={{ duration: 0.5, delay: 0.2 }}
                     >
                         <Link
-                            href="/challenges/9f8586c1-bdd4-4f1d-b112-6449de4c530d"
+                            href="/challenges/81699dcb-a988-4124-bd29-6bec3066c88d"
                             className="group bg-primary text-primary-foreground inline-flex items-center gap-2 rounded-lg px-6 py-3 font-mono transition-all duration-200 hover:scale-105 hover:shadow-lg"
                         >
                             {'>'} ENTER CHALLENGE
